@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: hustle-nation-store
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OWNER_USERNAME
+        value: owner
+      - key: OWNER_PASSWORD
+        sync: false
+      - key: CLIENT_USERNAME
+        value: admin
+      - key: CLIENT_PASSWORD
+        sync: false
+      - key: WHATSAPP_NUMBER
+        value: 27698881104
