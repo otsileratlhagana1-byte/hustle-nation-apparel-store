@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+<defs><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" result="n"/><feComposite in="SourceGraphic" in2="n" operator="arithmetic" k1=".8" k2=".5" k3=".2"/></filter></defs>
+<rect width="1000" height="700" rx="32" fill="#0b0b0b"/>
+<g fill="#f3f0e8" font-family="Impact,Arial Black,sans-serif" text-anchor="middle" filter="url(#rough)"><text x="500" y="190" font-size="150" letter-spacing="6">HUSTLE</text><text x="500" y="340" font-size="148" fill="#d88a18" letter-spacing="3">NATION</text></g>
+<path d="M165 390 Q500 350 835 390 Q500 470 165 390Z" fill="#f3f0e8"/>
+<text x="500" y="430" text-anchor="middle" font-family="Impact,Arial Black,sans-serif" font-size="95" fill="#0b0b0b">EST. 2024</text>
+<g fill="#d88a18"><path d="M115 330 l18 45 49 2-38 30 13 47-42-26-42 26 13-47-38-30 49-2z"/><path d="M885 330 l18 45 49 2-38 30 13 47-42-26-42 26 13-47-38-30 49-2z"/></g>
+<text x="500" y="535" text-anchor="middle" fill="#aaa" font-family="Arial,sans-serif" font-size="25" letter-spacing="5">THE STREET IS THE NAME • HUSTLE IN THE WAY</text>
+</svg>
