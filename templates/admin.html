@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hustle Nation Admin</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+body{background:#f5f5f5}.hn-admin{max-width:1200px;margin:auto;padding:25px}.hn-panel{background:#fff;border:1px solid #ddd;border-radius:16px;padding:20px;margin-bottom:20px}.hn-grid,.hn-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.hn-grid input,.hn-grid textarea{width:100%;padding:11px;margin-top:6px;box-sizing:border-box;border:1px solid #ccc;border-radius:8px}.hn-product{border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff}.hn-product img{width:100%;height:220px;object-fit:cover;border-radius:9px;background:#eee}.hn-btn{padding:11px 16px;border:0;border-radius:8px;background:#111;color:#fff}.note{color:#666;font-size:13px}
+</style></head><body><div class="hn-admin">
+<h1>HUSTLE NATION — STORE ADMIN</h1><p class="note">Manage homepage content and every product picture without changing your existing backend files.</p>
+<section class="hn-panel"><h2>Homepage</h2><form method="post" action="/admin/settings" enctype="multipart/form-data"><div class="hn-grid">
+<label>Store name<input name="store_name" value="{{ settings.store_name|default('Hustle Nation') }}"></label>
+<label>Tagline<input name="tagline" value="{{ settings.tagline|default('APPAREL • EST. 2024') }}"></label>
+<label>Hero title<input name="hero_title" value="{{ settings.hero_title|default('HUSTLE NATION') }}"></label>
+<label>Accent colour<input type="color" name="accent_color" value="{{ settings.accent_color|default('#111111') }}"></label>
+<label>Logo<input type="file" name="logo" accept="image/*"></label><label>Hero/background<input type="file" name="hero_image" accept="image/*"></label>
+</div><label>Hero text<textarea name="hero_text">{{ settings.hero_text|default('Streetwear built for the culture of hustlers.') }}</textarea></label><label>Shop text<textarea name="shop_text">{{ settings.shop_text|default('Discover the latest Hustle Nation collection.') }}</textarea></label><br><button class="hn-btn">SAVE HOMEPAGE</button></form></section>
+<section class="hn-panel"><h2>All Products & Pictures</h2><div class="hn-products">{% for p in products %}<article class="hn-product"><img src="{{ p.image or url_for('static', filename='images/product-placeholder.svg') }}" alt="{{ p.name }}"><h3>{{ p.name }}</h3><p>{{ p.category|default('') }}</p><p>Price: R{{ p.price|default(0) }}{% if p.sale_price %} • Sale: R{{ p.sale_price }}{% endif %}</p><p>Stock: {{ p.stock|default(0) }} • Sizes: {{ p.sizes|default('') }}</p><a class="hn-btn" href="/admin/products/edit/{{ p.id }}">EDIT PRODUCT</a></article>{% endfor %}</div></section>
+</div></body></html>
