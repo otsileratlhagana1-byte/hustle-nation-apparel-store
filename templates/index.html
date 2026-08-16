@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hustle Nation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    :root{--gold:#d99a25;--dark:#0a0a0a}
+    *{box-sizing:border-box}
+    body{margin:0;background:#0a0a0a;color:#f5f5f5;font-family:Arial,sans-serif}
+    .top{background:var(--gold);color:#080808;text-align:center;padding:8px;font-weight:800;font-size:12px;letter-spacing:1px}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:16px 6%;border-bottom:1px solid #292929;background:#0b0b0b;position:sticky;top:0;z-index:10}
+    .brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;font-weight:900;letter-spacing:1px}
+    .brand img{width:52px;height:52px;border-radius:50%;object-fit:contain;background:#111}
+    .cart{border:1px solid #555;background:#fff;color:#111;border-radius:30px;padding:10px 17px;font-weight:800}
+    .hero{min-height:58vh;display:flex;align-items:center;padding:70px 7%;background:linear-gradient(90deg,#000e,#0005),url("/static/images/logo.jpg") center/cover}
+    .hero h1{font-size:clamp(48px,9vw,110px);line-height:.9;margin:0 0 18px;font-weight:950}
+    .hero p{font-size:18px;max-width:600px;color:#ddd;line-height:1.6}
+    .btn{display:inline-block;background:#fff;color:#111;border:0;padding:13px 20px;border-radius:5px;font-weight:900;text-decoration:none;cursor:pointer}
+    main{max-width:1300px;margin:auto;padding:50px 6%}
+    .heading{display:flex;justify-content:space-between;gap:15px;align-items:end;flex-wrap:wrap}
+    .heading h2{font-size:34px;margin:0}.heading p{color:#aaa}
+    .tools{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+    .tools input,.tools select{padding:12px;border:1px solid #444;background:#151515;color:#fff;border-radius:6px;min-width:210px}
+    .filters{display:flex;gap:8px;overflow:auto;padding:5px 0 20px}
+    .filter{white-space:nowrap;border:1px solid #444;background:#151515;color:#ddd;padding:9px 13px;border-radius:20px}
+    .filter.active{background:#fff;color:#111}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+    .card{background:#111;border:1px solid #292929;border-radius:10px;overflow:hidden}
+    .pic{aspect-ratio:1;background:#171717;overflow:hidden}
+    .pic img{width:100%;height:100%;object-fit:cover}
+    .body{padding:15px}.body h3{margin:0 0 7px;font-size:17px}.meta{color:#888;font-size:12px;min-height:32px}
+    .price{font-size:19px;font-weight:900;margin:12px 0}.add{width:100%;padding:12px;border:0;border-radius:5px;background:#fff;color:#111;font-weight:900}
+    footer{border-top:1px solid #292929;padding:35px 6%;color:#aaa;text-align:center}
+    .modal{display:none;position:fixed;inset:0;background:#000b;z-index:30;align-items:center;justify-content:center;padding:18px}
+    .box{background:#fff;color:#111;width:min(520px,100%);border-radius:12px;padding:22px;max-height:90vh;overflow:auto}
+    .box input,.box textarea,.box select{width:100%;padding:12px;margin:7px 0;border:1px solid #bbb;border-radius:6px}
+    .cartline{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #ddd;padding:10px 0}
+    .close{float:right;background:#eee;border:0;padding:7px 10px;border-radius:5px}
+  </style>
+</head>
+<body>
+<div class="top">HUSTLE NATION • NATIONWIDE DELIVERY • EST. 2024</div>
+<nav>
+  <a class="brand" href="/">
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Hustle Nation">
+    <span>HUSTLE NATION</span>
+  </a>
+  <button class="cart" onclick="openCart()">CART (<span id="count">0</span>)</button>
+</nav>
+
+<header class="hero">
+  <div>
+    <h1>HUSTLE<br>NATION</h1>
+    <p>A clothing brand established in 2024 to diversify the culture of hustlers who like fashion. The street is the name, hustle in the way.</p>
+    <a class="btn" href="#shop">SHOP NOW</a>
+  </div>
+</header>
+
+<main id="shop">
+  <div class="heading">
+    <div><h2>SHOP ALL</h2><p>Hustle Nation apparel and accessories.</p></div>
+  </div>
+  <div class="tools">
+    <input id="search" placeholder="Search products..." oninput="renderProducts()">
+    <select id="sort" onchange="renderProducts()">
+      <option value="featured">Featured</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+  </div>
+  <div class="filters" id="filters">
+    {% for category in categories %}
+      <button class="filter {% if loop.first %}active{% endif %}" data-category="{{ category|e }}" onclick="setCategory(this)">{{ category }}</button>
+    {% endfor %}
+  </div>
+  <div class="grid" id="productGrid"></div>
+</main>
+
+<footer>
+  <div>Nationwide delivery available • PAXI / PEP</div>
+  <div>WhatsApp: +27 69 888 1104</div>
+  <div>© 2024 Hustle Nation • © 2026 • Designed by Otsile Graphics</div>
+</footer>
+
+<div class="modal" id="cartModal">
+  <div class="box">
+    <button class="close" onclick="closeCart()">CLOSE</button>
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+    <h3 id="cartTotal">Total: R0</h3>
+    <button class="btn" onclick="checkout()">CHECKOUT / WHATSAPP</button>
+  </div>
+</div>
+
+<div class="modal" id="checkoutModal">
+  <div class="box">
+    <button class="close" onclick="closeCheckout()">CLOSE</button>
+    <h2>Checkout</h2>
+    <form onsubmit="sendOrder(event)">
+      <input id="name" required placeholder="Full name">
+      <input id="phone" required placeholder="Phone number">
+      <textarea id="address" required placeholder="Delivery address"></textarea>
+      <select id="shipping" required>
+        <option value="PAXI / PEP">PAXI / PEP</option>
+        <option value="Nationwide courier">Nationwide courier</option>
+        <option value="Collection">Collection</option>
+      </select>
+      <select id="payment" required>
+        <option value="WhatsApp confirmation">WhatsApp confirmation</option>
+        <option value="EFT / bank transfer">EFT / bank transfer</option>
+        <option value="Cash on collection">Cash on collection</option>
+      </select>
+      <button class="btn" type="submit">SEND ORDER TO WHATSAPP</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = {{ products|tojson }};
+let selectedCategory = "All";
+let cart = JSON.parse(localStorage.getItem("hustleCart") || "{}");
+
+function money(n){return "R"+Number(n||0).toLocaleString("en-ZA");}
+function setCategory(btn){
+  document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+  selectedCategory=btn.dataset.category;
+  renderProducts();
+}
+function renderProducts(){
+  const q=(document.getElementById("search").value||"").toLowerCase().trim();
+  const sort=document.getElementById("sort").value;
+  let list=PRODUCTS.filter(p=>{
+    const cat=selectedCategory==="All"||p.category===selectedCategory;
+    const text=`${p.name||""} ${p.category||""} ${p.type||""} ${p.tag||""}`.toLowerCase();
+    return cat && (!q||text.includes(q));
+  });
+  if(sort==="low") list.sort((a,b)=>a.price-b.price);
+  if(sort==="high") list.sort((a,b)=>b.price-a.price);
+  document.getElementById("productGrid").innerHTML=list.map(p=>`
+    <article class="card">
+      <div class="pic"><img src="/static/images/${encodeURIComponent(p.image)}" alt="${escapeHtml(p.name)}" onerror="this.src='/static/images/logo.jpg'"></div>
+      <div class="body">
+        <h3>${escapeHtml(p.name)}</h3>
+        <div class="meta">${escapeHtml(p.category||"")} • ${escapeHtml(p.type||"")}</div>
+        <div class="price">${money(p.price)}</div>
+        <button class="add" onclick="addToCart(${p.id})">ADD TO CART</button>
+      </div>
+    </article>`).join("") || "<p>No products found.</p>";
+}
+function escapeHtml(s){return String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
+function addToCart(id){cart[id]=(cart[id]||0)+1;save();renderCart();openCart();}
+function save(){localStorage.setItem("hustleCart",JSON.stringify(cart));updateCount();}
+function updateCount(){document.getElementById("count").textContent=Object.values(cart).reduce((a,b)=>a+b,0);}
+function cartProducts(){return Object.entries(cart).map(([id,qty])=>({p:PRODUCTS.find(x=>x.id==id),qty})).filter(x=>x.p);}
+function renderCart(){
+  const rows=cartProducts();
+  document.getElementById("cartItems").innerHTML=rows.length?rows.map(({p,qty})=>`
+    <div class="cartline"><span>${escapeHtml(p.name)} × ${qty}</span><span>${money(p.price*qty)}
+    <button onclick="changeQty(${p.id},-1)">−</button><button onclick="changeQty(${p.id},1)">+</button></span></div>`).join(""):"Cart is empty.";
+  document.getElementById("cartTotal").textContent="Total: "+money(rows.reduce((s,x)=>s+x.p.price*x.qty,0));
+  updateCount();
+}
+function changeQty(id,n){cart[id]=(cart[id]||0)+n;if(cart[id]<=0)delete cart[id];save();renderCart();}
+function openCart(){renderCart();document.getElementById("cartModal").style.display="flex";}
+function closeCart(){document.getElementById("cartModal").style.display="none";}
+function checkout(){if(!cartProducts().length)return alert("Your cart is empty.");closeCart();document.getElementById("checkoutModal").style.display="flex";}
+function closeCheckout(){document.getElementById("checkoutModal").style.display="none";}
+async function sendOrder(e){
+  e.preventDefault();
+  const rows=cartProducts();
+  const total=rows.reduce((s,x)=>s+x.p.price*x.qty,0);
+  const data={customer:{name:document.getElementById("name").value,phone:document.getElementById("phone").value,address:document.getElementById("address").value},items:rows.map(x=>({id:x.p.id,name:x.p.name,qty:x.qty,price:x.p.price})),total,shipping:document.getElementById("shipping").value,payment:document.getElementById("payment").value};
+  try{
+    const r=await fetch("/api/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    const out=await r.json();
+    if(out.whatsapp){cart={};save();location.href=out.whatsapp;return;}
+  }catch(err){}
+  const msg=`HUSTLE NATION ORDER\nCustomer: ${data.customer.name}\nPhone: ${data.customer.phone}\nAddress: ${data.customer.address}\nShipping: ${data.shipping}\nPayment: ${data.payment}\n\n`+rows.map(x=>`${x.qty} x ${x.p.name} - ${money(x.p.price)} each`).join("\n")+`\n\nTOTAL: ${money(total)}`;
+  location.href="https://wa.me/27698881104?text="+encodeURIComponent(msg);
+}
+renderProducts();updateCount();
+</script>
+</body>
+</html>
